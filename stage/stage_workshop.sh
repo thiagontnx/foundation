@@ -1,6 +1,7 @@
 #!/bin/bash
 
 WORKSHOPS=("NHT Labs" \
+"Xi Frame Single Node Lab" \
 "Change Cluster Input File" \
 "Validate Staged Clusters" \
 "Quit")
@@ -39,6 +40,10 @@ function select_workshop {
     case $WORKSHOP in
       "NHT Labs")
       PE_CONFIG=stage_nhtlabs.sh
+      break
+      ;;
+      "Xi Frame Single Node Lab")
+      PE_CONFIG=stage_framesinglenode.sh
       break
       ;;
       "Change Cluster Input File")
