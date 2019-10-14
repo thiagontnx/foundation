@@ -19,6 +19,7 @@ FRAMEGA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameGuestAgentInstaller_1
 FRAMECCA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameCCA-2.1.0.iso'
 MY_PC_SRC_URL='http://10.42.194.11/workshop_staging/euphrates-5.11-stable-prism_central.tar'
 MY_PC_META_URL='http://10.42.194.11/workshop_staging/euphrates-5.11-stable-prism_central-metadata.json'
+VIRTIO_ISO_SRC='http://download.nutanix.com/mobility/1.1.4/Nutanix-VirtIO-1.1.4.iso'
 PC_VERSION='5.11'
 
 source /etc/profile.d/nutanix_env.sh
@@ -125,6 +126,8 @@ my_log "Importing Frame Guest Agent image"
 acli image.create FrameGuestAgent_1.0.1.7_77120.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMEGA_ISO_SRC} wait=true
 my_log "Importing Frame CCA"
 acli image.create FrameCCA-2.0.0.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMECCA_ISO_SRC} wait=true
+my_log "Importing VirtIO ISO"
+acli image.create VirtIO-1.1.4.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${VIRTIO_ISO_SRC} wait=true
 # Remove existing VMs, if any
 my_log "Removing \"Windows 2012\" VM if it exists"
 acli -y vm.delete Windows\ 2012\ VM delete_snapshots=true
