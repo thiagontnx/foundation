@@ -211,9 +211,9 @@ On the **Start** page, fill out the following fields:
    Selecting **Yes** will allow you to tag the CVM/Hypervisor VLAN as part of the installation, saving additional steps post-Foundation for readying the cluster to cutover to a production network. It is common for the Ethernet uplinks for each node to be connected to trunked ports tagged for several VLANs (CVM/Hypervisor network, user VM networks, backup network, etc.).
 
 - **Netmask of Every Host and CVM** - 255.255.255.128
-- **Gateway of Every Host and CVM** - 10.42.\ *XYZ*\ .1
+- **Gateway of Every Host and CVM** - 10.\ *ABC*\ .\ *XYZ*\ .1
 - **Netmask of Every IPMI** - 255.255.255.128
-- **Gateway of Every IPMI** - 10.42.\ *XYZ*\ .1
+- **Gateway of Every IPMI** - 10.\ *ABC*\ .\ *XYZ*\ .1
 
 .. figure:: images/7.png
 
@@ -275,7 +275,7 @@ Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond t
 - **Cluster Redundancy Factor** - RF2
 
   *Redundancy Factor 2 requires a minimum of 3 nodes, Redundancy Factor 3 requires a minimum of 5 nodes. Cluster creation during Foundation will fail if the appropriate minimum is not met.*
-- **Cluster Virtual IP** - 10.42.\ *XYZ*\ .37
+- **Cluster Virtual IP** - 10.\ *ABC*\ .\ *XYZ*\ .37
 
   *Cluster Virtual IP needs to be within the same subnet as the CVM/hypervisor.*
 - **NTP Servers of Every CVM** - 10.42.196.10
@@ -289,7 +289,10 @@ Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond t
 
 .. figure:: images/11.png
 
-From within the Foundation VM console, download your desired AOS package from http://10.42.194.11/workshop_staging/nht/.
+From within the Foundation VM console, download your desired AOS package from:
+
+- *If using a PHX cluster* - http://10.42.194.11/workshop_staging/nht/
+- *If using a RTP cluster* - http://10.55.251.38/workshop_staging/nht/
 
 .. note::
 
@@ -300,7 +303,7 @@ From within the Foundation VM console, download your desired AOS package from ht
   To get your lab back on track, without abandoning your progress in your local browser:
 
   - Open the Foundation VM console from within Prism
-  - Download your AOS package from http://10.42.194.11/workshop_staging/nht/ and place it in the ~/foundation/nos folder. This is the directory that Foundation will place packages uploaded through the web interface.
+  - Download your AOS package from the site specific (RTP/PHX) link provided above and place it in the ~/foundation/nos folder. This is the directory that Foundation will place packages uploaded through the web interface.
 
   .. figure:: images/12.png
 
