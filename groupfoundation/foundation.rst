@@ -348,7 +348,7 @@ Open \https://*<Cluster Virtual IP>*:9440 in your local browser and log in with 
 
 .. figure:: images/21.png
 
-Change the password, accept the EULA, and enable Pulse.
+Change the password (e.g. *techX2019!*), accept the EULA, and enable Pulse.
 
 Post-Foundation Network Configuration
 +++++++++++++++++++++++++++++++++++++

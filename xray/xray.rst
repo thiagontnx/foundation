@@ -171,7 +171,7 @@ Select **Targets** from the navigation bar and click **Add Target**. Fill out th
 - **Password** - ADMIN
 - **Prism Address** - *<3-Node Cluster Virtual IP>*
 - **Username** - admin
-- **Password** - techX2019!
+- **Password** - *<Your 3-node Cluster Prism Password>*
 
 .. figure:: images/11.png
 
