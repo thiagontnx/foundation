@@ -68,7 +68,10 @@ Creating X-Ray VM
 
 Next you will deploy the X-Ray VM outside of your cluster targeted for testing. This is to ensure X-Ray tests that perform power operations on hosts don't inadvertently power off the X-Ray VM itself.
 
-Log into **Prism Element** on your **1-node** cluster (10.42.\ *XYZ*\ .32).
+Log into **Prism Element** on your **1-node** cluster (10.42.\ *XYZ*\ .32) using the following credentials:
+
+   - **Username** - admin
+   - **Password** - techX2019!
 
 In **Prism > VM > Table** and click **+ Create VM**.
 
