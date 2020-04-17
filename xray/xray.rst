@@ -31,13 +31,14 @@ References and Downloads
 
 The following links are provided for reference and not required to complete the lab exercise.
 
-- `X-Ray Guide <https://portal.nutanix.com/#/page/docs/details?targetId=X-Ray-Guide-v33:X-Ray-Guide-v33>`_ - *X-Ray documentation*
-- `X-Ray Downloads <https://portal.nutanix.com/#/page/static/supportTools>`_ - *Portal location to download the latest X-Ray OVA and QCOW2 images.*
+- `X-Ray User Guide <https://portal.nutanix.com/page/documents/details?targetId=X-Ray-Guide-v3_7:X-Ray-Guide-v3_7>`_ - *X-Ray documentation*
+- `X-Ray Downloads <https://portal.nutanix.com/#/page/XRay>`_ - *Portal location to download the latest X-Ray OVA, QCOW2, and VHDX images.*
 - `X-Ray Vision as Nutanix Goes Open Source <https://www.nutanix.com/2018/05/09/x-ray-vision-as-nutanix-goes-open-source/>`_ - *Nutanix blog article explaining the impact of open sourcing X-Ray.*
 - `Nutanix GitLab Page <https://gitlab.com/nutanix>`_ - *Public facing repository of opensource X-Ray components including scenarios and Curie engine.*
 - `HCI Performance Testing Made Easy (Part 1) <https://www.n0derunner.com/2018/09/hci-performance-testing-made-easy-part-1/>`_ - *Gary Little blog/video series on using X-Ray.*
 - `HCI Performance Testing Made Easy (Part 2) <https://www.n0derunner.com/2018/09/hci-performance-testing-made-easy-part-2/>`_ - *Gary Little blog/video series on using X-Ray.*
 - `HCI Performance Testing Made Easy (Part 3) <https://www.n0derunner.com/2018/09/hci-performance-testing-made-easy-part-3/>`_ - *Gary Little blog/video series on using X-Ray.*
+- `Using X-Ray Against VSAN <https://mindtickle.app.link/SzZAVJwEL5>`_ - *Internal Whiteboard Warrior Series*
 
 Configuring Target Cluster Networks
 +++++++++++++++++++++++++++++++++++
@@ -48,18 +49,20 @@ Open **Prism > VM > Table** and click **Network Config**.
 
 .. figure:: images/0.png
 
-We will use the **Secondary** network VLAN for communication between the X-Ray VM and X-Ray worker VMs. This is accomplished via "Zero Configuration" networking, as the 3-node cluster **Secondary** and 1-node cluster **Secondary** networks are the same Layer 2 network and there is no DHCP.
-
 Click **Virtual Networks > Create Network**.
 
 Using the `Cluster Details`_ spreadsheet, fill out the following fields and click **Save**:
 
 - **Name** - Secondary
-- **VLAD ID** - *<Secondary VLAN ID>*
+- **VLAN ID** - *<Secondary VLAN ID>*
 
 .. figure:: images/1.png
 
+Click the **X** icon in the top, right-hand corner to close **Network Configuration**.
+
 .. note::
+
+   We will use the **Secondary** network VLAN for communication between the X-Ray VM and X-Ray worker VMs. This is accomplished via "Zero Configuration" networking, as the 3-node cluster **Secondary** and 1-node cluster **Secondary** networks are the same Layer 2 network and there is no DHCP.
 
    You can create the VLAN 0 network on this cluster as well, though it is not required for this exercise.
 
@@ -71,13 +74,15 @@ Next you will deploy the X-Ray VM outside of your cluster targeted for testing. 
 Log into **Prism Element** on your **1-node** cluster (10.42.\ *XYZ*\ .32) using the following credentials:
 
    - **Username** - admin
-   - **Password** - techX2019!
+   - **Password** - techX2020!
 
 In **Prism > VM > Table** and click **+ Create VM**.
 
 Fill out the following fields and click **Save**:
 
 - **Name** - XRay
+- **Description** - *Optional*
+- **Timezone** - *Leave Default*
 - **vCPU(s)** - 2
 - **Number of Cores per vCPU** - 1
 - **Memory** - 4 GiB
@@ -99,10 +104,6 @@ Select your **XRay** VM and click **Power on**.
 
 The X-Ray VM is created with 2 NICs. The **Primary** NIC allows for access to the web interface from any other routable network, and the **Secondary** network is only for communication between X-Ray and its worker VMs deployed on target clusters.
 
-.. note::
-
-  At the time of writing, X-Ray 3.4 is the latest available version. The URL for the latest X-Ray OVA & QCOW2 images can be downloaded from the `Nutanix Portal <https://portal.nutanix.com/#/page/static/supportTools>`_.
-
 Once the VM has started, click **Launch Console**.
 
 Click **Applications > System Tools > Settings** in the upper-left hand corner of the X-Ray VM console.
@@ -117,15 +118,17 @@ Under **Network**, select :fa:`cog` under **Ethernet (eth0)**.
 
 .. figure:: images/3.png
 
-Select **IPv4**. Using the `Cluster Details`_ spreadsheet, fill out the following fields and click **Apply**:
+Select **IPv4**. Using the `Cluster Details`_ spreadsheet, fill out the following fields:
 
 - **IPv4 Method** - Manual
-- **Address** - 10.42.\ *XYZ*\ .42
+- **Address** - 10.42.\ *XYZ*\ .126
 - **Netmask** - 255.255.255.128
 - **Gateway** - 10.42.\ *XYZ*\ .1
-- **DNS** - 10.42.196.10
+- **DNS** - 10.42.194.10
 
 .. figure:: images/4.png
+
+Click **Apply**.
 
 Use the toggle switch to turn the **eth0** adapter off and back on to ensure the new IP is applied.
 
@@ -136,29 +139,13 @@ Use the toggle switch to turn the **eth0** adapter off and back on to ensure the
 Configuring X-Ray
 +++++++++++++++++
 
-Open \https://<*XRAY-VM-IP*>/ in a browser. Enter a password for the local secret score, such as your Prism cluster password, and click **Enter**.
+Open \https://<*XRAY-VM-IP*>/ in a browser. Enter a password for the local secret score, such as your Prism cluster password, and click **Enter**. This is used to encrypt passwords for X-Ray test targets.
 
 .. figure:: images/7.png
 
 Select **I have read and agree to the terms and conditions** and click **Accept**.
 
 .. figure:: images/8.png
-
-Click **My Nutanix Login** and specify your my.nutanix.com credentials. Fill out the following fields and click **Generate Token**:
-
-- **Customer Name** - Nutanix Sales Enablement
-- **Opportunity ID** - New Hire Training
-- **Choose a reason for using X-Ray** - Self training on Nutanix
-
-.. figure:: images/5.png
-
-Click **Done**.
-
-.. figure:: images/6.png
-
-.. note::
-
-  If deploying X-Ray in an environment without internet access, tokens can be generated at https://my.nutanix.com/#/page/xray.
 
 Next you will configure your 3-node cluster as the target for running X-Ray tests.
 
@@ -181,7 +168,7 @@ Select **Secondary** under **Network** and click **Next**.
 
 This will provision any X-Ray worker VMs on the target cluster using our VLAN without DHCP for zero configuration networking between worker VMs and the X-Ray VM.
 
-Select **Supermicro** from the **IPMI Type** menu. Review **Node Info** and click **Next**.
+Ensure **Supermicro** is selected as the **IPMI Type**. Click **Next**.
 
 .. figure:: images/13.png
 
@@ -189,7 +176,7 @@ Click **Run Validation**.
 
 .. figure:: images/14.png
 
-Click **Check Details** to view validation progress.
+Click **Check Details** to view validation progress. Validation will ensure that the X-Ray VM can communicate with IPMI on each node, as well as deploy and communicate with worker VMs.
 
 .. figure:: images/15.png
 
@@ -206,7 +193,7 @@ Select **Tests** from the navigation bar and select **Four Corners Microbenchmar
 
 .. figure:: images/17.png
 
-Review the test description, then select your **Test-Cluster** under **Choose test target** and click **Run Test**.
+Review the test description, then select your cluster under **Choose test target** and click **Run Test**.
 
 .. figure:: images/18.png
 
@@ -238,6 +225,21 @@ Each dotted blue line represents an event in the test, such as beginning a workl
 
 Clicking the **Actions** drop down menu provides options to view the detailed log data, export the test results, and generate a PDF report.
 
+Build Your Own Microbenchmark
++++++++++++++++++++++++++++++
+
+HCIBench is another popular tool used to generate arbitrary storage workloads on ESXi. X-Ray can provide this same functionality, with the added benefits of a UI to easily configure workloads and the flexibility to support multiple hypervisors.
+
+Select **Tests** from the navigation bar and select **Build Your Own Microbenchmark > View & Run Test**.
+
+Select your cluster under **Choose test target**.
+
+Select **Custom** under **Choose the test variant** and use the available controls to customize your workload (e.g. Maximum 100% Random 16KB IOs, 70% Reads, 6 OIO, 2VMs per node, 8 disks per VM).
+
+.. figure:: images/27.png
+
+Click **Run Test**.
+
 Working with X-Ray Results
 ++++++++++++++++++++++++++
 
@@ -258,15 +260,11 @@ Click **Choose File** and select the Nutanix test results .zip file previously d
 
 Repeat to import the Competitor test results .zip file.
 
-Refresh the **Results** page and note **NTNX** and **Competitor-X** Big Data Ingestion test results now appear in the list as finished.
+Refresh the **Results** page and note **NTNX** and **Competitor-X** Big Data Ingestion test results now appear in the list as finished (*They may be at the bottom of the list*).
 
-Select both tests and click **Create Comparison** to generate a comparison of the two sets of results.
+Select both tests and click **Create Comparison** to generate a comparison of the two sets of results, which will be automatically opened.
 
 .. figure:: images/24.png
-
-Under **My Comparisons**, select the **Comparative Result Name** of your newly created comparison.
-
-.. figure:: images/25.png
 
 The resulting charts show the combined metrics for both solutions. In this case we can clearly see that the Nutanix solution is able to sustain a higher, and more consistent, rate of write throughput, resulting in a much faster time to complete ingesting the 1TB of data.
 

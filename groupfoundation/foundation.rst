@@ -86,10 +86,10 @@ During the remainder of the exercise, your team will:
 Installing Foundation
 +++++++++++++++++++++
 
-Open \https://*<CVM IP of NODE D>*:9440 in your browser and log in with the following credentials:
+Open \https://*<CVM IP of NODE D>*:9440 (*The correct IP should end in .32*) in your browser and log in with the following credentials:
 
 - **Username** - admin
-- **Password** - techX2019!
+- **Password** - techX2020!
 
 Open **Prism > VM > Table** and click **Network Config**.
 
@@ -102,16 +102,16 @@ Click **Virtual Networks > Create Network**.
 Fill out the following fields and click **Save**:
 
 - **Name** - Primary
-- **VLAD ID** - 0
+- **VLAN ID** - 0
 
 .. note::
 
-   Using VLAN 0 (referred to as an **Untagged** or **Access** network) is equivalent to running a Foundation VM on your laptop, with a bridged network connection to your physical Ethernet adapter, plugged into a flat, unmanaged switch connected to your Nutanix block being imaged.
+   Using VLAN 0 (referred to as an **Untagged** or **Access** network) is equivalent to running a Foundation VM on your laptop, with a bridged network connection to your physical Ethernet adapter, plugged into a flat, unmanaged switch connected to your Nutanix block being imaged - putting all devices on the same Layer 2 network.
 
 Click **Create Network**. Using the `Cluster Details`_ spreadsheet, fill out the following fields and click **Save**:
 
 - **Name** - Secondary
-- **VLAD ID** - *<Secondary VLAN ID>*
+- **VLAN ID** - *<Secondary VLAN ID>*
 
 .. figure:: images/00.png
 
@@ -119,11 +119,15 @@ Click **Create Network**. Using the `Cluster Details`_ spreadsheet, fill out the
 
    The **Secondary** network will be used later in the :ref:`groupxray_lab` lab.
 
+Click the **X** icon in the top, right-hand corner to close **Network Configuration**.
+
 In **Prism > VM > Table** and click **+ Create VM**.
 
-Fill out the following fields and click **Save**:
+Fill out the following fields:
 
 - **Name** - Foundation
+- **Description** - *Optional*
+- **Timezone** - *Leave Default*
 - **vCPU(s)** - 2
 - **Number of Cores per vCPU** - 1
 - **Memory** - 4 GiB
@@ -137,13 +141,15 @@ Fill out the following fields and click **Save**:
   - **VLAN Name** - Primary
   - Select **Add**
 
+Click **Save**.
+
 Select your **Foundation** VM and click **Power on**.
 
 .. note::
 
-  At the time of writing, Foundation 4.3.4 is the latest available version. The URL for the latest Foundation VM QCOW2 image can be downloaded from the `Nutanix Portal <https://portal.nutanix.com/#/page/foundation>`_.
+  At the time of writing, Foundation 4.5.2 is the latest available version.
 
-  **Unless otherwise directed by support, always use the latest version of Foundation.**
+  When running Foundation in the field, always be sure to use the `latest version of Foundation <https://portal.nutanix.com/#/page/foundation>`_, unless otherwise directed by support.
 
 Once the VM has started, click **Launch Console**.
 
@@ -153,17 +159,17 @@ Once the VM has finished booting, click **nutanix**. Enter the default password 
 
 Double-click **set_foundation_ip_address > Run in Terminal**.
 
-Select **Device configuration** and press **Return**.
+Press **Return** to select **Device configuration**.
 
 .. figure:: images/2.png
 
-Select **eth0** and press **Return**.
+Press **Return** to select **eth0**.
 
 .. figure:: images/3.png
 
 .. note:: Use the arrow keys to navigate between menu items.
 
-Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network, fill out the following fields, select **OK** and press **Return**:
+Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network (*DO NOT USE THE VALUES FROM THE SCREENSHOTS BELOW!*), fill out the following fields:
 
 - Un-select **Use DHCP** by pressing **Space**
 - **Static IP** - *<Foundation VM IP>*
@@ -171,6 +177,8 @@ Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond t
 - **Gateway** - *<Gateway IP>*
 
 .. figure:: images/4.png
+
+Select **OK** and press **Return**.
 
 .. note::
 
@@ -183,6 +191,8 @@ Select **Save** and press **Return**.
 Select **Save & Quit** and press **Return**.
 
 .. figure:: images/6.png
+
+This will restart the **eth0** interface, allowing you to contact the Foundation VM using the configured static IP.
 
 Running Foundation
 ++++++++++++++++++
@@ -197,21 +207,18 @@ If prompted to upgrade, click **Remind Me Later**.
 
 On the **Start** page, fill out the following fields:
 
-- **Select which network to use for this installer** - eth0
 - **Select your hardware platform** - Nutanix
 - **Will your production switch do link aggregation?** - No
-- **Will your production switch have VLANs** - No
+- **Netmask of Every Host and CVM** - 255.255.255.128
+- **Gateway of Every Host and CVM** - 10.42.\ *XYZ*\ .1
+- **Netmask of Every IPMI** - 255.255.255.128
+- **Gateway of Every IPMI** - 10.42.\ *XYZ*\ .1
+
+.. figure:: images/7.png
 
 .. note::
 
-   Selecting **Yes** will allow you to tag the CVM/Hypervisor VLAN as part of the installation, saving additional steps post-Foundation for readying the cluster to cutover to a production network. It is common for the Ethernet uplinks for each node to be connected to trunked ports tagged for several VLANs (CVM/Hypervisor network, user VM networks, backup network, etc.).
-
-- **Netmask of Every Host and CVM** - 255.255.255.128
-- **Gateway of Every Host and CVM** - 10.\ *ABC*\ .\ *XYZ*\ .1
-- **Netmask of Every IPMI** - 255.255.255.128
-- **Gateway of Every IPMI** - 10.\ *ABC*\ .\ *XYZ*\ .1
-
-.. figure:: images/7.png
+   Specifying a host/CVM VLAN will allow you to tag the CVM/Hypervisor VLAN as part of the installation, saving additional steps post-Foundation for readying the cluster to cutover to a production network. It is common for the Ethernet uplinks for each node to be connected to trunked ports tagged for several VLANs (CVM/Hypervisor network, user VM networks, backup network, etc.).
 
 .. note::
 
@@ -219,7 +226,7 @@ On the **Start** page, fill out the following fields:
 
 .. note::
 
-  When imaging a cluster with Foundation, the CVMs and hypervisor management IP addresses must be in the same subnet. IPMI IP addresses can be in the same, or different, subnet. If IPMI will not be in the same subnet as CVM/hypervisor, Foundation can use different IP addresses for IPMI and CVM/hypervisor while on a flat, L2 network by clicking **Assign two IP addresses to this installer**.
+  When imaging a cluster with Foundation, the CVMs and hypervisor management IP addresses must be in the same subnet. IPMI IP addresses can be in the same, or different, subnet. If IPMI will not be in the same subnet as CVM/hypervisor, Foundation can use different IP addresses for IPMI and CVM/hypervisor while on a flat, L2 network by clicking **Add a new interface**.
 
 Click **Next**.
 
@@ -274,8 +281,8 @@ Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond t
 - **Cluster Virtual IP** - 10.\ *ABC*\ .\ *XYZ*\ .37
 
   *Cluster Virtual IP needs to be within the same subnet as the CVM/hypervisor.*
-- **NTP Servers of Every CVM** - 10.42.196.10
-- **DNS Servers of Every CVM and Host** - 10.42.196.10
+- **NTP Servers of Every CVM** - 10.42.194.10
+- **DNS Servers of Every CVM and Host** - 10.42.194.10
 
   *DNS and NTP servers should be captured as part of install planning with the customer.*
 
@@ -295,9 +302,11 @@ In Firefox, open http://10.42.194.11/workshop_staging/nht/ and select an availab
 
 .. figure:: images/12.png
 
-Return to the Foundation web interface in your local browser. Click **Manage AOS Files > Refresh** and note your *nutanix_installer_package-release-\*.tar.gz* package now appears.
+Once the download completes (~60 seconds), return to the Foundation web interface in your local browser.
 
-.. figure:: images/14.png
+Click **Manage AOS Files > Refresh** and note your *nutanix_installer_package-release-\*.tar.gz* package now appears.
+
+.. figure:: images/16.png
 
 Close the dialog box and select your AOS package from the dropdown menu.
 
@@ -315,7 +324,7 @@ Fill out the following fields and click **Next**:
 
 .. note::
 
-  When selecting an alternate hypervisor (ESXi, Hyper-V, XenServer) you can use this page to upload installation ISO files and, if necessary, modified whitelists.
+  When selecting an alternate hypervisor (ESXi, Hyper-V) you can use this page to upload installation ISO files and, if necessary, modified whitelists.
 
 Select **Fill with Nutanix defaults** from the **Tools** dropdown menu to populate the credentials used to access IPMI on each node.
 
@@ -348,7 +357,9 @@ Open \https://*<Cluster Virtual IP>*:9440 in your local browser and log in with 
 
 .. figure:: images/21.png
 
-Change the password (e.g. *techX2019!*), accept the EULA, and enable Pulse.
+When prompted, change the default password to **techX2020!**
+
+Accept the EULA, and enable Pulse.
 
 Post-Foundation Network Configuration
 +++++++++++++++++++++++++++++++++++++

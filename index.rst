@@ -33,15 +33,20 @@ Welcome to Nutanix New Hire Training! Carefully review the **Overview** section 
 Cluster Access
 ++++++++++++++
 
-The Nutanix Hosted Proof of Concept (HPOC) environment can only be accessed via VPN or by connecting to the **NTNX_corp** network.
+The Nutanix Hosted Proof of Concept (HPOC) environment can only be accessed via VPN, Frame desktop, or by connecting to the **NTNX_corp** wireless network.
 
 GlobalProtect VPN Access
 ........................
 
 Browse to https://gp.nutanix.com.
 
-Log in with your OKTA credentials.
+Log in with your Okta credentials.
 
 Download and install the appropriate GlobalProtect agent for your operating system.
 
 Launch GlobalProtect and configure **gp.nutanix.com** as the **Portal** address.
+
+Frame Access
+............
+
+Use your corporate Frame desktop via Okta.
