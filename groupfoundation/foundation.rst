@@ -23,14 +23,14 @@ Using the spreadsheet below, locate your **Group Number** and corresponding deta
 
 .. raw:: html
 
-   <iframe width="98%" height="600" frameborder="0" scrolling="no" src="https://nutanixinc-my.sharepoint.com/:x:/g/personal/matthew_bator_nutanix_com/EdpnKQfT40pMmMOqhfZEuNEBYhyKzLamWA7bt4SICGqF-A?e=X5snC7&action=embedview&Item='Cluster%20Details'!A1%3AM41&wdHideGridlines=True&wdInConfigurator=True"></iframe>
+   <iframe width="98%" height="600" frameborder="0" scrolling="no" src="https://nutanixinc-my.sharepoint.com/:x:/g/personal/matthew_bator_nutanix_com/EdpnKQfT40pMmMOqhfZEuNEBYhyKzLamWA7bt4SICGqF-A?e=qhLzym&action=embedview&Item='Cluster%20Details'!A1%3AM41&wdHideGridlines=True&wdInConfigurator=True"></iframe>
 
 References and Downloads
 ........................
 
 The following links are provided for reference and not required to complete the lab exercise.
 
-- `Field Installation Guide <https://portal.nutanix.com/#/page/docs/details?targetId=Field-Installation-Guide-v4-3:Field-Installation-Guide-v4-3>`_ - *Comprehensive Foundation documentation. Refer to Preparing the Installation Environment section for complete steps for local deployment of Foundation VM.*
+- `Field Installation Guide <https://portal.nutanix.com/page/documents/details?targetId=Field-Installation-Guide-v4_6:Field-Installation-Guide-v4_6>`_ - *Comprehensive Foundation documentation. Refer to Preparing the Installation Environment section for complete steps for local deployment of Foundation VM.*
 - `Foundation Release Notes <https://portal.nutanix.com/#/page/docs/details?targetId=Field-Installation-Guide-Rls-Notes-v4-3:Field-Installation-Guide-Rls-Notes-v4-3>`_ - *Fixes, known issues, enhancements, and upgrade information.*
 - `NX Hardware System Specifications <https://portal.nutanix.com/#/page/docs/list?type=hardware>`_ - *Helpful for determining LAN/IPMI/Shared ports for different hardware platforms.*
 - `Foundation binaries and related files <https://portal.nutanix.com/#/page/foundation>`_ - *Downloads for baremetal Foundation, CVM Foundation, and ISO whitelist. Use Foundation_VM-<version>.tar download for local Foundation VM deployment.*
@@ -73,10 +73,11 @@ A Hosted POC reservation provides a fully imaged cluster consisting of 4 nodes. 
 - A three node cluster using Nodes A, B, and C has been created
 - A single node LAB "cluster" using Node D has been created
 - The Foundation VM disk image has been staged in the Node D cluster Image Service
+- The Foundation VM has been created on Node D
 
-During the remainder of the exercise, your team will:
+During the remainder of the exercise, you will:
 
-- Install the Foundation VM on Node D
+- Configure the Foundation VM network IP address
 - Use Foundation to image Nodes A, B, and C and create a 3 node cluster
 
 .. note::
@@ -86,280 +87,255 @@ During the remainder of the exercise, your team will:
 Installing Foundation
 +++++++++++++++++++++
 
-Open \https://*<CVM IP of NODE D>*:9440 (*The correct IP should end in .32*) in your browser and log in with the following credentials:
+#. Using the `Cluster Details`_ spreadsheet, open \https://*<CVM IP of NODE D>*:9440 in your browser and log in with the following credentials:
 
-- **Username** - admin
-- **Password** - techX2020!
+   :html:`<strong><font color="red">The NODE D CVM IP will end in .32 for this environment.</font></strong>`
 
-Open **Prism > VM > Table** and click **Network Config**.
+   - **Username** - admin
+   - **Password** - techX2020!
 
-.. figure:: images/0.png
+#. From the Prism Element drop-down menu in the upper left-hand corner, select **VM** and open the **Table** view.
 
-Before creating the VM, we must first create a virtual network to assign to the Foundation VM. The network will use the Native VLAN assigned to the physical uplinks for all 4 nodes in the block.
+   .. figure:: images/0.png
 
-Click **Virtual Networks > Create Network**.
+#. Select the **Foundation** VM and click **Launch Console**.
 
-Fill out the following fields and click **Save**:
+   .. figure:: images/0b.png
 
-- **Name** - Primary
-- **VLAN ID** - 0
+   .. note::
 
-.. note::
+     At the time of writing, Foundation 4.6 is the latest available version.
 
-   Using VLAN 0 (referred to as an **Untagged** or **Access** network) is equivalent to running a Foundation VM on your laptop, with a bridged network connection to your physical Ethernet adapter, plugged into a flat, unmanaged switch connected to your Nutanix block being imaged - putting all devices on the same Layer 2 network.
+     When running Foundation in the field, always be sure to use the `latest version of Foundation <https://portal.nutanix.com/#/page/foundation>`_, unless otherwise directed by support.
 
-Click **Create Network**. Using the `Cluster Details`_ spreadsheet, fill out the following fields and click **Save**:
+#. Within the VM console, select the **nutanix** user.
 
-- **Name** - Secondary
-- **VLAN ID** - *<Secondary VLAN ID>*
+#. Enter the default password (**nutanix/4u**) and click **Log In**.
 
-.. figure:: images/00.png
+   .. figure:: images/1.png
 
-.. note::
+#. Double-click **set_foundation_ip_address > Run in Terminal**.
 
-   The **Secondary** network will be used later in the :ref:`groupxray_lab` lab.
+#. Press **Return** to select **Device configuration**.
 
-Click the **X** icon in the top, right-hand corner to close **Network Configuration**.
+   .. figure:: images/2.png
 
-In **Prism > VM > Table** and click **+ Create VM**.
+#. Press **Return** to select **eth0**.
 
-Fill out the following fields:
+   .. figure:: images/3.png
 
-- **Name** - Foundation
-- **Description** - *Optional*
-- **Timezone** - *Leave Default*
-- **vCPU(s)** - 2
-- **Number of Cores per vCPU** - 1
-- **Memory** - 4 GiB
-- Select **+ Add New Disk**
+   .. note:: Use the arrow keys to navigate between menu items.
 
-  - **Operation** - Clone from Image Service
-  - **Image** - Foundation.qcow2
-  - Select **Add**
-- Select **Add New NIC**
+#. Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network, fill out the following fields:
 
-  - **VLAN Name** - Primary
-  - Select **Add**
+   :html:`<strong><font color="red">DO NOT USE THE VALUES FROM THE SCREENSHOTS BELOW!</font></strong>`
 
-Click **Save**.
+   - Un-select **Use DHCP** by pressing **Space**
+   - **Static IP** - *<Foundation VM IP>*
+   - **Netmask** - 255.255.255.128
+   - **Gateway** - *<Gateway IP>*
 
-Select your **Foundation** VM and click **Power on**.
+   .. figure:: images/4.png
 
-.. note::
+#. Select **OK** and press **Return**.
 
-  At the time of writing, Foundation 4.5.2 is the latest available version.
+   .. note::
 
-  When running Foundation in the field, always be sure to use the `latest version of Foundation <https://portal.nutanix.com/#/page/foundation>`_, unless otherwise directed by support.
+     The Foundation VM IP address should be in the same subnet as the target IP range for the CVM/hypervisor of the nodes being imaged. As Foundation is typically performed on a flat switch and not on a production network, the Foundation IP can generally be any IP in the target subnet that doesn't conflict with the CVM/hypervisor/IPMI IP of a targeted node.
 
-Once the VM has started, click **Launch Console**.
+#. Select **Save** and press **Return**.
 
-Once the VM has finished booting, click **nutanix**. Enter the default password (**nutanix/4u**) and click **Log In**.
+   .. figure:: images/5.png
 
-.. figure:: images/1.png
+#. Select **Save & Quit** and press **Return**.
 
-Double-click **set_foundation_ip_address > Run in Terminal**.
+   .. figure:: images/6.png
 
-Press **Return** to select **Device configuration**.
+   This will restart the **eth0** interface, allowing you to contact the Foundation VM using the configured static IP.
 
-.. figure:: images/2.png
-
-Press **Return** to select **eth0**.
-
-.. figure:: images/3.png
-
-.. note:: Use the arrow keys to navigate between menu items.
-
-Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network (*DO NOT USE THE VALUES FROM THE SCREENSHOTS BELOW!*), fill out the following fields:
-
-- Un-select **Use DHCP** by pressing **Space**
-- **Static IP** - *<Foundation VM IP>*
-- **Netmask** - 255.255.255.128
-- **Gateway** - *<Gateway IP>*
-
-.. figure:: images/4.png
-
-Select **OK** and press **Return**.
-
-.. note::
-
-  The Foundation VM IP address should be in the same subnet as the target IP range for the CVM/hypervisor of the nodes being imaged. As Foundation is typically performed on a flat switch and not on a production network, the Foundation IP can generally be any IP in the target subnet that doesn't conflict with the CVM/hypervisor/IPMI IP of a targeted node.
-
-Select **Save** and press **Return**.
-
-.. figure:: images/5.png
-
-Select **Save & Quit** and press **Return**.
-
-.. figure:: images/6.png
-
-This will restart the **eth0** interface, allowing you to contact the Foundation VM using the configured static IP.
+#. Close the **Foundation** VM console.
 
 Running Foundation
 ++++++++++++++++++
 
-From your local browser, open \http://*<Foundation VM IP>*:8000/gui/index.html to access the Foundation web interface.
+#. From your local browser, open \http://*<Foundation VM IP>*:8000/gui/index.html to access the Foundation web interface.
 
-If prompted to upgrade, click **Remind Me Later**.
+   .. note::
 
-.. note::
+      Opening \http://*<Foundation VM IP>* will automatically redirect to the right port and index file.
 
-  For physical deployments ensure you are using the latest version of Foundation. Any available upgrades are skipped for the lab due to time constraints.
+#. If prompted to upgrade, click **Remind Me Later**.
 
-On the **Start** page, fill out the following fields:
+   .. note::
 
-- **Select your hardware platform** - Nutanix
-- **Will your production switch do link aggregation?** - No
-- **Netmask of Every Host and CVM** - 255.255.255.128
-- **Gateway of Every Host and CVM** - 10.42.\ *XYZ*\ .1
-- **Netmask of Every IPMI** - 255.255.255.128
-- **Gateway of Every IPMI** - 10.42.\ *XYZ*\ .1
+     For physical deployments ensure you are using the latest version of Foundation. Any available upgrades are skipped for the lab due to time constraints.
 
-.. figure:: images/7.png
+#. Using the `Cluster Details`_ spreadsheet, on the **Start** page, fill out the following fields:
 
-.. note::
+   - **Select your hardware platform** - Nutanix
+   - **Do you want RDMA passthrough to the CVMs?** - No
+   - **What type of LAGs will your production switch have?** - None
+   - **To assign a VLAN to host/CVMs, enter the tag:** - *Leave Blank*
+   - **Netmask of Every Host and CVM** - 255.255.255.128
+   - **Gateway of Every Host and CVM** - *<Gateway IP>*
+   - **Netmask of Every IPMI** - 255.255.255.128
+   - **Gateway of Every IPMI** - *<Gateway IP>*
 
-   Specifying a host/CVM VLAN will allow you to tag the CVM/Hypervisor VLAN as part of the installation, saving additional steps post-Foundation for readying the cluster to cutover to a production network. It is common for the Ethernet uplinks for each node to be connected to trunked ports tagged for several VLANs (CVM/Hypervisor network, user VM networks, backup network, etc.).
+   .. figure:: images/7.png
 
-.. note::
+   .. note::
 
-  Foundation node/cluster settings can optionally be pre-configured using https://install.nutanix.com and imported from the **Start** page. This will not be done as part of the lab.
+      Specifying a host/CVM VLAN will allow you to tag the CVM/Hypervisor VLAN as part of the installation, saving additional steps post-Foundation for readying the cluster to cutover to a production network. It is common for the Ethernet uplinks for each node to be connected to trunked ports tagged for several VLANs (CVM/Hypervisor network, user VM networks, backup network, etc.).
 
-.. note::
+   .. note::
 
-  When imaging a cluster with Foundation, the CVMs and hypervisor management IP addresses must be in the same subnet. IPMI IP addresses can be in the same, or different, subnet. If IPMI will not be in the same subnet as CVM/hypervisor, Foundation can use different IP addresses for IPMI and CVM/hypervisor while on a flat, L2 network by clicking **Add a new interface**.
+     Foundation node/cluster settings can optionally be pre-configured using https://install.nutanix.com and imported from the **Start** page. This will not be done as part of the lab.
 
-Click **Next**.
+   .. note::
 
-Click **Click here** to manually specify the MAC address of your assigned nodes.
+     When imaging a cluster with Foundation, the CVMs and hypervisor management IP addresses must be in the same subnet. IPMI IP addresses can be in the same, or different, subnet. If IPMI will not be in the same subnet as CVM/hypervisor, Foundation can use different IP addresses for IPMI and CVM/hypervisor while on a flat, L2 network by clicking **Add a new interface**.
 
-.. note::
+#. Click **Next**.
 
-  Foundation will automatically discover any hosts in the same IPv6 Link Local broadcast domain that is not already part of a cluster.
+#. Click **Click here** to manually specify the MAC address of your assigned nodes.
 
-  .. figure:: images/7b.png
+   .. note::
 
-  When transferring POC assets in the field, it's not uncommon to receive a cluster that wasn't properly destroyed at the conclusion of the previous POC. In this lab, the nodes are already part of existing clusters and will not be discovered.
+     Foundation will automatically discover any hosts in the same IPv6 Link Local broadcast domain that is not already part of a cluster.
 
-Fill out the following fields and click **Add Nodes**:
+     .. figure:: images/7b.png
 
-- **Number of Blocks** - 1
-- **Nodes per Block** - 3
-- Select **I will provide the IPMI MACs**
+     When transferring POC assets in the field, it's not uncommon to receive a cluster that wasn't properly destroyed at the conclusion of the previous POC. In this lab, the nodes are already part of existing clusters and will not be discovered.
 
-.. figure:: images/8.png
+#. Fill out the following fields and click **Add Nodes**:
 
-Using the `Cluster Details`_ spreadsheet, fill out the following fields for **Nodes A, B, and C ONLY** and click **Next**:
+   - **Number of Blocks** - 1
+   - **Nodes per Block** - 3
+   - Select **I will provide the IPMI MACs**
 
-.. note::
+   .. figure:: images/8.png
 
-  Use **Tools > Range Autofill** to quickly specify Node IPs. Specify the first IP in the field at the top of the table to provide enumerated values for the entire column.
+#. Using the `Cluster Details`_ spreadsheet, fill out the following fields for **Nodes A, B, and C ONLY** and click **Next**:
 
-- **Node** - *<Node Position>*
-- **IPMI MAC** - *<IPMI MAC>*
-- **IPMI IP** - *<IPMI IP>*
-- **Host IP** - *<Hypervisor IP>*
-- **CVM IP** - *<CVM IP>*
-- **Hypervisor Hostname** - *<Hypervisor Hostname>*
+   .. note::
 
-.. figure:: images/10.png
+     Use **Tools > Range Autofill** to quickly specify Node IPs. Specify the first IP in the field at the top of the table to provide enumerated values for the entire column.
 
-.. note::
+   - **Node** - *<Node Position>*
+   - **IPMI MAC** - *<IPMI MAC>*
+   - **IPMI IP** - *<IPMI IP>*
+   - **Host IP** - *<Hypervisor IP>*
+   - **CVM IP** - *<CVM IP>*
+   - **Hypervisor Hostname** - *<Hypervisor Hostname>*
 
-  In addition to the IPMI MAC address labels on the back of each node. Watchtower can be used to collect the IPMI MAC addresses of any NX appliance: *\http://watchtower.corp.nutanix.com/factoryData/<Block Serial>/*
+   .. figure:: images/10.png
 
-  Watchtower requires VPN connection.
+   .. note::
 
-Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network, fill out the following fields and click **Next**:
+     In addition to the IPMI MAC address labels on the back of each node. Watchtower can be used to collect the IPMI MAC addresses of any NX appliance: *\http://watchtower.corp.nutanix.com/factoryData/<Block Serial>/*
 
-- **Cluster Name** - Test-Cluster
+     Watchtower requires VPN connection.
 
-  *Cluster Name is a "friendly" name that can be easily changed post-installation. It is common to create a DNS A record of the Cluster Name that points to the Cluster Virtual IP.*
-- **Timezone of Every CVM** - America/Los_Angeles
-- **Cluster Redundancy Factor** - RF2
+#. Using the `Cluster Details`_ spreadsheet, replace the octet(s) that correspond to your HPOC network, fill out the following fields and click **Next**:
 
-  *Redundancy Factor 2 requires a minimum of 3 nodes, Redundancy Factor 3 requires a minimum of 5 nodes. Cluster creation during Foundation will fail if the appropriate minimum is not met.*
-- **Cluster Virtual IP** - 10.\ *ABC*\ .\ *XYZ*\ .37
+   - **Cluster Name** - Test-Cluster
 
-  *Cluster Virtual IP needs to be within the same subnet as the CVM/hypervisor.*
-- **NTP Servers of Every CVM** - 10.42.194.10
-- **DNS Servers of Every CVM and Host** - 10.42.194.10
+     *Cluster Name is a "friendly" name that can be easily changed post-installation. It is common to create a DNS A record of the Cluster Name that points to the Cluster Virtual IP.*
+   - **Timezone of Every CVM** - America/Los_Angeles
+   - **Cluster Redundancy Factor** - RF2
 
-  *DNS and NTP servers should be captured as part of install planning with the customer.*
+     *Redundancy Factor 2 requires a minimum of 3 nodes, Redundancy Factor 3 requires a minimum of 5 nodes. Cluster creation during Foundation will fail if the appropriate minimum is not met.*
+   - **Cluster Virtual IP** - 10.\ *ABC*\ .\ *XYZ*\ .37
 
-- **vRAM Allocation for Every CVM, in Gigabytes** - 32
+     *Cluster Virtual IP needs to be within the same subnet as the CVM/hypervisor.*
+   - **NTP Servers of Every CVM** - 10.42.194.10
+   - **DNS Servers of Every CVM and Host** - 10.42.194.10
 
-  *Refer to AOS Release Notes > Controller VM Memory Configurations for guidance on CVM Memory Allocation.*
+     *DNS and NTP servers should be captured as part of install planning with the customer.*
 
-.. figure:: images/11.png
+   - **vRAM Allocation for Every CVM, in Gigabytes** - 32
 
-Next, you will need to download an AOS package on your Foundation VM.
+     *Refer to AOS Release Notes > Controller VM Memory Configurations for guidance on CVM Memory Allocation.*
 
-:html:`<strong><font color="red">Do not start downloading an AOS package from the Portal to then upload to your Foundation VM. While this is what you would do for a Foundation VM running locally on your laptop, downloading and re-uploading a ~4.5GB package over the WAN/VPN will take HOURS. Instead, follow the instructions below to download the AOS package from WITHIN your Foundation VM, accessing a file share on the same LAN as your HPOC cluster.</font></strong>`
+   .. figure:: images/11.png
 
-Open the Foundation VM console from within Prism Element.
+#. Next, you will need to download an AOS package on your Foundation VM.
 
-In Firefox, open http://10.42.194.11/workshop_staging/nht/ and select an available AOS package. Save the file in the **~/foundation/nos** directory.
+   :html:`<strong><font color="red">Do not start downloading an AOS package from the Portal to then upload to your Foundation VM. While this is what you would do for a Foundation VM running locally on your laptop, downloading and re-uploading a ~4.5GB package over the WAN/VPN will take HOURS. Instead, follow the instructions below to download the AOS package from WITHIN your Foundation VM, accessing a file share on the same LAN as your HPOC cluster.</font></strong>`
 
-.. figure:: images/12.png
+#. Return to **Prism > VM > Table** and open the **Foundation** VM console.
 
-Once the download completes (~60 seconds), return to the Foundation web interface in your local browser.
+#. In Firefox, open http://10.42.194.11/workshop_staging/nht/ and select the latest available AOS package. Save the file in the **~/foundation/nos** directory.
 
-Click **Manage AOS Files > Refresh** and note your *nutanix_installer_package-release-\*.tar.gz* package now appears.
+   .. figure:: images/12.png
 
-.. figure:: images/16.png
+#. Once the download completes (~60 seconds), return to the Foundation web interface in your local browser.
 
-Close the dialog box and select your AOS package from the dropdown menu.
+#. Click **Manage AOS Files > Refresh** and note your *nutanix_installer_package-release-\*.tar.gz* package now appears.
 
-Click **Next** to select your desired hypervisor image.
+   .. figure:: images/16.png
 
-Fill out the following fields and click **Next**:
+   .. note::
 
-- **Select a hypervisor installer** - AHV, AHV installer bundled inside the AOS installer
+      If you were to click **+ Add** to upload a local file to your Foundation VM, the file would be placed in the **~/foundation/nos** directory. Transfering a file directly to that folder is a good way to easily pre-populate builds into your Foundation VM.
 
-.. figure:: images/17.png
+#. Close the dialog box and select your AOS package from the dropdown menu.
 
-.. note::
+#. Click **Next** to select your desired hypervisor image.
 
-  Every AOS release contains a version of AHV bundled with that release.
+#. Fill out the following fields and click **Next**:
 
-.. note::
+   - **Select a hypervisor installer** - AHV, AHV installer bundled inside the AOS installer
 
-  When selecting an alternate hypervisor (ESXi, Hyper-V) you can use this page to upload installation ISO files and, if necessary, modified whitelists.
+   .. figure:: images/17.png
 
-Select **Fill with Nutanix defaults** from the **Tools** dropdown menu to populate the credentials used to access IPMI on each node.
+   .. note::
 
-.. figure:: images/18.png
+     Every AOS release contains a version of AHV bundled with that release.
 
-.. note:: When performing a baremetal Foundation in the field, ensure your laptop will not go to sleep due to inactivity.
+   .. note::
 
-Click **Start > Proceed** and continue to monitor Foundation progress through the Foundation web console. Click the **Log** link to view the realtime log output from your node.
+     When selecting an alternate hypervisor (ESXi, Hyper-V) you can use this page to upload installation ISO files and, if necessary, modified whitelists.
 
-.. figure:: images/19.png
+#. Select **Range Autofill** from the **Tools** dropdown menu to populate the credentials used to access IPMI on each node:
 
-Foundation will leverage IPMI (or the Out of Band Management standard for the given hardware platform, e.g. iDRAC, iLO, CIMC, etc.) to boot each node to a virtual CD image called Phoenix. The Phoenix image contains what are called "Layout Modules." Layout Modules provide critical hardware information to the installer, allowing Nutanix to support a wide range of hardware configurations (NX, Dell, Lenovo, IBM, Cisco, HPE, Klas, Crystal, etc.).
+   - **Username** - ADMIN
+   - **Password** - ADMIN
 
-Phoenix will download the AOS and hypervisor binaries from the Foundation VM. Once Phoenix is booted on each node, Phoenix communicates with Foundation via the node's LAN connection. IPMI is only used for mounting the virtual CD image.
+   .. figure:: images/18.png
 
-Phoenix will then perform an automated installation of the hypervisor (including any packaged drivers) to the appropriate boot media (SATADOM, SD Card, M.2 SSD) and writes the CVM filesystem to a dedicated partition on the first SSD in the system (NOT on the hypervisor boot media).
+   .. note:: On newer NX nodes, the default ADMIN password is required to be unique for each node and is set to the node serial number.
 
-After these tasks are completed, the node reboots to the newly installed hypervisor. The hypervisor iterates through the SSDs to find out which SSD has the CVM, and then boots the CVM. Firstboot scripts are run to prepare the hypervisor and CVM on the node, including setting IP information.
+   .. note:: When performing a baremetal Foundation in the field, ensure your laptop will not go to sleep due to inactivity.
 
-When all CVMs are ready, Foundation initiates the cluster creation process.
+   .. note:: If your nodes were automatically discovered via IPv6, it may not require IPMI credentials.
 
-.. figure:: images/20.png
+#. Click **Start > Proceed** and continue to monitor Foundation progress through the Foundation web console. Click the **Log** link to view the real-time log output from your node.
 
-**Close the Foundation VM Console.**
+   .. figure:: images/19.png
 
-Open \https://*<Cluster Virtual IP>*:9440 in your local browser and log in with the following credentials:
+   Foundation will leverage IPMI (or the Out of Band Management standard for the given hardware platform, e.g. iDRAC, iLO, CIMC, etc.) to boot each node to a virtual CD image called Phoenix. The Phoenix image contains what are called "Layout Modules." Layout Modules provide critical hardware information to the installer, allowing Nutanix to support a wide range of hardware configurations (NX, Dell, Lenovo, IBM, Cisco, HPE, Klas, Crystal, etc.).
 
-- **Username** - admin
-- **Password** - Nutanix/4u
+   Phoenix will download the AOS and hypervisor binaries from the Foundation VM. Once Phoenix is booted on each node, Phoenix communicates with Foundation via the node's LAN connection. IPMI is only used for mounting the virtual CD image.
 
-.. figure:: images/21.png
+   Phoenix will then perform an automated installation of the hypervisor (including any packaged drivers) to the appropriate boot media (SATADOM, SD Card, M.2 SSD) and writes the CVM filesystem to a dedicated partition on the first SSD in the system (NOT on the hypervisor boot media).
 
-When prompted, change the default password to **techX2020!**
+   After these tasks are completed, the node reboots to the newly installed hypervisor. The hypervisor iterates through the SSDs to find out which SSD has the CVM, and then boots the CVM. Firstboot scripts are run to prepare the hypervisor and CVM on the node, including setting IP information.
 
-Accept the EULA, and enable Pulse.
+   When all CVMs are ready, Foundation initiates the cluster creation process.
+
+   .. figure:: images/20.png
+
+#. Once Foundation has completed, open \https://*<Cluster Virtual IP>*:9440 in your local browser and log in with the following credentials:
+
+   - **Username** - admin
+   - **Password** - Nutanix/4u
+
+   .. figure:: images/21.png
+
+#. When prompted, change the default password to **techX2020!**.
+
+#. Accept the EULA, and enable Pulse.
 
 Post-Foundation Network Configuration
 +++++++++++++++++++++++++++++++++++++
@@ -382,9 +358,46 @@ Refer to the `AHV Administration Guide <https://portal.nutanix.com/#/page/docs/d
 ESXi
 ....
 
-Coming soon!
+*Coming soon!*
 
 Hyper-V
 .......
 
-Coming soon!
+*Coming soon!*
+
+Next Steps
+++++++++++
+
+Before proceeding to the **SE POC Guide** that you will use to direct additional hands-on exercises to be completed during New Hire Training, you will first destroy the single node "cluster" on **Node D**. This will allow you to add **Node D** to your existing 3 node cluster in a later exercise.
+
+#. Using an SSH client such as **Terminal** (macOS) or **PuTTY** (Windows), connect to your single node cluster:
+
+   - **IP** - *<CVM IP of NODE D>* (*THE CORRECT IP WILL END IN .32*)
+   - **Username** - nutanix
+   - **Password** - nutanix/4u
+
+#. Double check you're connected to the correct CVM.
+
+#. Triple check you're connected to the correct CVM.
+
+#. Run the following command to power off your **Foundation** VM:
+
+   ::
+      
+      acli vm.off Foundation
+
+#. Run the following command to stop all Nutanix cluster services (e.g. storage, Prism, ZooKeeper, etc.):
+
+   ::
+
+      cluster stop
+      y
+
+#. Run the following command to destroy the single node cluster:
+
+   ::
+
+      cluster destroy
+      y
+
+   This operation may take several minutes to complete.

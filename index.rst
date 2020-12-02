@@ -7,8 +7,8 @@
   :hidden:
 
   groupfoundation/foundation
-  xray/xray
-  ncc/ncc
+..  xray/xray
+..  ncc/ncc
 
 .. toctree::
   :maxdepth: 2
@@ -49,4 +49,8 @@ Launch GlobalProtect and configure **gp.nutanix.com** as the **Portal** address.
 Frame Access
 ............
 
-Use your corporate Frame desktop via Okta.
+Log into https://frame.nutanix.com/x/labs using your nutanixdc.local credentials.
+
+.. note::
+
+   If required, you can reset your nutanixdc.local password using `RX <https://rx.corp.nutanix.com>`_.

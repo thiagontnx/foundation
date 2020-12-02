@@ -6,6 +6,14 @@ WORKSHOPS=("NHT Labs" \
 "Validate Staged Clusters" \
 "Quit")
 
+
+if ! command -v sshpass &> /dev/null
+then
+    echo "Installing sshpass"
+    wget http://10.42.194.11/workshop_staging/sshpass-1.06-2.el7.x86_64.rpm
+    sudo rpm -i sshpass-1.06-2.el7.x86_64.rpm
+fi
+
 function remote_exec {
   sshpass -p $MY_PE_PASSWORD ssh -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null nutanix@$MY_PE_HOST "$@"
 }

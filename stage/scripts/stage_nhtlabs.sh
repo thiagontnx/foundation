@@ -12,8 +12,10 @@ MY_NEW_PE_PASSWORD='techX2020!'
 MY_SP_NAME='SP01'
 MY_CONTAINER_NAME='Default'
 MY_IMG_CONTAINER_NAME='Images'
-MY_FND_SRC_URL='http://download.nutanix.com/Foundation/4.5.2/Foundation_VM-4.5.2-disk-0.qcow2'
-MY_XRAY_SRC_URL='http://download.nutanix.com/XRay/3.7.0/xray.qcow2'
+MY_PRIMARY_NET_NAME='Primary'
+MY_PRIMARY_NET_VLAN='0'
+MY_FND_SRC_URL='http://10.42.194.11/workshop_staging/nht/Foundation_VM-4.6-disk-0.qcow2'
+# MY_XRAY_SRC_URL='http://download.nutanix.com/XRay/3.7.0/xray.qcow2'
 
 # Source Nutanix environments (for PATH and other things)
 source /etc/profile.d/nutanix_env.sh
@@ -24,7 +26,7 @@ function my_log {
 }
 
 # Create single node cluster
-yes | cluster --cluster_name=NHTLab --dns_servers=10.42.194.10 --ntp_servers=10.42.194.10 --svm_ips=${MY_CVM_IP} create
+yes | cluster -s ${MY_CVM_IP} --redundancy_factor=1 --cluster_name=NHTLab --dns_servers=10.42.194.10 --ntp_servers=10.42.194.10 create
 
 # Wait for Prism to start
 sleep 300
@@ -57,19 +59,17 @@ until [[ $(acli image.create ${MY_IMAGE} container="${MY_IMG_CONTAINER_NAME}" im
   sleep 5
 done
 
-MY_IMAGE="X-Ray.qcow2"
-retries=1
-my_log "Importing ${MY_IMAGE} image"
-until [[ $(acli image.create ${MY_IMAGE} container="${MY_IMG_CONTAINER_NAME}" image_type=kDiskImage source_url=${MY_XRAY_SRC_URL} wait=true) =~ "complete" ]]; do
-  let retries++
-  if [ $retries -gt 5 ]; then
-    my_log "${MY_IMAGE} failed to upload after 5 attempts. This cluster may require manual remediation."
-    acli vm.create STAGING-FAILED-${MY_IMAGE}
-    break
-  fi
-  my_log "acli image.create ${MY_IMAGE} FAILED. Retrying upload (${retries} of 5)..."
-  sleep 5
-done
+# Create primary network
+my_log "Create primary network"
+acli net.create ${MY_PRIMARY_NET_NAME} vlan=${MY_PRIMARY_NET_VLAN}
+
+# Create AutoDC & power on
+my_log "Create Foundation VM"
+acli vm.create Foundation num_vcpus=4 num_cores_per_vcpu=1 memory=8G
+acli vm.disk_create Foundation clone_from_image=Foundation.qcow2
+acli vm.nic_create Foundation network=${MY_PRIMARY_NET_NAME}
+my_log "Power on Foundation VM"
+acli vm.on Foundation
 
 # Validate EULA on PE
 my_log "Validate EULA on PE"
