@@ -15,11 +15,11 @@ MY_SECONDARY_NET_NAME='Desktop'
 MY_SECONDARY_NET_VLAN="${MY_HPOC_NUMBER}1"
 WIN10_IMG_SRC='http://10.42.194.11/workshop_staging/Windows10-1709.qcow2'
 WIN2012R2_IMG_SRC='http://10.42.194.11/workshop_staging/Windows2012R2.qcow2'
-FRAMEGA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameGuestAgentInstaller_1.0.2.2_7930.iso'
-FRAMECCA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameCCA-2.1.0.iso'
-MY_PC_SRC_URL='http://10.42.194.11/workshop_staging/euphrates-5.11-stable-prism_central.tar'
-MY_PC_META_URL='http://10.42.194.11/workshop_staging/euphrates-5.11-stable-prism_central-metadata.json'
-VIRTIO_ISO_SRC='http://download.nutanix.com/mobility/1.1.4/Nutanix-VirtIO-1.1.4.iso'
+# FRAMEGA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameGuestAgentInstaller_1.0.2.2_7930.iso'
+# FRAMECCA_ISO_SRC='http://10.42.194.11/workshop_staging/FrameCCA-2.1.0.iso'
+MY_PC_SRC_URL='http://10.42.194.11/workshop_staging/pc.2021.1.tar'
+MY_PC_META_URL='http://10.42.194.11/workshop_staging/pcdeploy-pc.2021.1.json'
+VIRTIO_ISO_SRC='https://download.nutanix.com/mobility/1.1.6/Nutanix-VirtIO-1.1.6.iso'
 PC_VERSION='5.11'
 
 source /etc/profile.d/nutanix_env.sh
@@ -122,12 +122,12 @@ my_log "Importing Windows 10 image"
 acli image.create Windows10 container="${MY_IMG_CONTAINER_NAME}" image_type=kDiskImage source_url=${WIN10_IMG_SRC} wait=true
 my_log "Importing Windows 2012R2 image"
 acli image.create Windows2012R2 container="${MY_IMG_CONTAINER_NAME}" image_type=kDiskImage source_url=${WIN2012R2_IMG_SRC} wait=true
-my_log "Importing Frame Guest Agent image"
-acli image.create FrameGuestAgent_1.0.1.7_77120.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMEGA_ISO_SRC} wait=true
-my_log "Importing Frame CCA"
-acli image.create FrameCCA-2.0.0.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMECCA_ISO_SRC} wait=true
+# my_log "Importing Frame Guest Agent image"
+# acli image.create FrameGuestAgent_1.0.1.7_77120.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMEGA_ISO_SRC} wait=true
+# my_log "Importing Frame CCA"
+# acli image.create FrameCCA-2.0.0.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${FRAMECCA_ISO_SRC} wait=true
 my_log "Importing VirtIO ISO"
-acli image.create VirtIO-1.1.4.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${VIRTIO_ISO_SRC} wait=true
+acli image.create VirtIO-1.1.6.iso container="${MY_IMG_CONTAINER_NAME}" image_type=kIsoImage source_url=${VIRTIO_ISO_SRC} wait=true
 # Remove existing VMs, if any
 my_log "Removing \"Windows 2012\" VM if it exists"
 acli -y vm.delete Windows\ 2012\ VM delete_snapshots=true
@@ -202,8 +202,8 @@ MY_DEPLOY_BODY=$(cat <<EOF
           }],
           "dns_server_ip_list":["${PHX_DNS_IP}"],
           "container_uuid":"${MY_CONTAINER_UUID}",
-          "num_sockets":4,
-          "memory_size_bytes":17179869184,
+          "num_sockets":6,
+          "memory_size_bytes":3250000000,
           "vm_name":"PC"
       }]
   }
